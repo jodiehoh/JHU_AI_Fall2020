@@ -119,19 +119,62 @@ def breadthFirstSearch(problem):
             return ans
 
         for succ in problem.getSuccessors(node[0]):
-            if(succ[0] not in visited):
+            if (succ[0] not in visited):
                 queue.push(succ)
                 visited.add(succ[0])
                 parent[succ[0]] = node[0]
                 direction[succ[0]] = succ[1]
     
 
-    
-
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    from util import PriorityQueue
+
+    visited = set()
+    ans = list()
+
+    parent = {problem.getStartState() : None}
+    direction = {problem.getStartState() : 0}
+    cost = {}
+
+    queue = PriorityQueue()
+    queue.push((problem.getStartState(), 0, 0), 0)
+    visited.add(problem.getStartState())
+
+
+    while not queue.isEmpty():
+
+        node = queue.pop()
+        print(node[0])
+        
+        visited.add(node[0])
+
+        if(problem.isGoalState(node[0])):
+            end = True
+            curr = node[0]
+            while(curr is not None):
+                ans.append(direction[curr])
+                curr = parent[curr]
+            ans.pop()
+            ans.reverse()
+            return ans
+
+        
+
+        for succ in problem.getSuccessors(node[0]):
+            if (succ[0] not in visited):
+                currPrio = succ[2] + node[2];
+                if (succ[0] in cost):
+                    if (cost[succ[0]] <= currPrio):
+                        continue      
+
+                queue.push(succ, currPrio)
+                cost[succ[0]] = currPrio
+                parent[succ[0]] = node[0]
+                direction[succ[0]] = succ[1]
+            
+
 
 def nullHeuristic(state, problem=None):
     """
