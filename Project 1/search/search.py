@@ -136,7 +136,7 @@ def uniformCostSearch(problem):
 
     parent = {problem.getStartState() : None}
     direction = {problem.getStartState() : 0}
-    cost = {}
+    cost = {problem.getStartState() : 0}
 
     queue = PriorityQueue()
     queue.push((problem.getStartState(), 0, 0), 0)
@@ -146,9 +146,6 @@ def uniformCostSearch(problem):
     while not queue.isEmpty():
 
         node = queue.pop()
-        print(node[0])
-        
-        visited.add(node[0])
 
         if(problem.isGoalState(node[0])):
             end = True
@@ -161,18 +158,13 @@ def uniformCostSearch(problem):
             return ans
 
         
-
         for succ in problem.getSuccessors(node[0]):
-            if (succ[0] not in visited):
-                currPrio = succ[2] + node[2];
-                if (succ[0] in cost):
-                    if (cost[succ[0]] <= currPrio):
-                        continue      
-
-                queue.push(succ, currPrio)
-                cost[succ[0]] = currPrio
-                parent[succ[0]] = node[0]
+            if(succ[0] not in visited or cost[node[0]] + succ[2] < cost[succ[0]]):
+                visited.add(succ[0])
+                cost[succ[0]] = cost[node[0]] + succ[2]
                 direction[succ[0]] = succ[1]
+                queue.push((succ[0], succ[1], cost[succ[0]]), cost[succ[0]])
+                parent[succ[0]] = node[0]
             
 
 
