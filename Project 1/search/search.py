@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -87,7 +87,28 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    from util import Stack
+
+    stack = Stack()  # stack of Nodes
+    visited = set()
+
+    node = Node(problem.getStartState(), None, 0, None)
+    stack.push(node)
+
+    while not stack.isEmpty():
+        curr = stack.pop()
+        visited.add(curr.state)
+
+        if problem.isGoalState(curr.state):
+            return path(curr, problem)
+
+        successors = problem.getSuccessors(curr.state)
+        for s in successors:
+            if s[0] not in visited:
+                newNode = Node(s[0], s[1], s[2], curr)
+                stack.push(newNode)
+
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
@@ -124,7 +145,7 @@ def breadthFirstSearch(problem):
                 visited.add(succ[0])
                 parent[succ[0]] = node[0]
                 direction[succ[0]] = succ[1]
-    
+
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
@@ -156,7 +177,6 @@ def uniformCostSearch(problem):
             ans.pop()
             ans.reverse()
             return ans
-
         
         for succ in problem.getSuccessors(node[0]):
             if(succ[0] not in visited or cost[node[0]] + succ[2] < cost[succ[0]]):
@@ -165,7 +185,7 @@ def uniformCostSearch(problem):
                 direction[succ[0]] = succ[1]
                 queue.push((succ[0], succ[1], cost[succ[0]]), cost[succ[0]])
                 parent[succ[0]] = node[0]
-            
+        
 
 
 def nullHeuristic(state, problem=None):
@@ -178,7 +198,53 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    from util import PriorityQueue
+
+    open = PriorityQueue()
+    closed = set()
+
+    node = Node(problem.getStartState(), None, 0, None)
+    open.push(node, node.cost + heuristic(node.state, problem))
+
+    while not open.isEmpty():
+        curr = open.pop()
+        closed.add(curr.state)
+
+        if problem.isGoalState(curr.state):
+            return path(curr, problem)
+
+        successors = problem.getSuccessors(curr.state)
+        for s in successors:
+            if s[0] not in closed:
+                newNode = Node(s[0], s[1], s[2] + curr.cost, curr)
+                f = newNode.cost + heuristic(newNode.state, problem)
+                open.update(newNode, f)
+
+
+def path(node, problem):
+    actions = list()
+
+    while node.state != problem.getStartState():
+        actions.append(node.direction)
+        node = node.parent
+
+    actions.reverse()
+    return actions
+
+
+class Node:
+
+    state = (-1, -1)
+    direction = None
+    cost = 0
+    parent = None
+
+    def __init__(self, state, direction, cost, parent):
+        self.state = state
+        self.direction = direction
+        self.cost = cost
+        self.parent = parent
 
 
 # Abbreviations
