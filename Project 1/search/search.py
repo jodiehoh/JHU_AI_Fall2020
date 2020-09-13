@@ -1,3 +1,6 @@
+#Charissa Zou (czou9)
+#Jodie Hoh (jhoh5)
+
 # search.py
 # ---------
 # Licensing Information:  You are free to use or extend these projects for

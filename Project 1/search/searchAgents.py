@@ -1,3 +1,6 @@
+#Charissa Zou (czou9)
+#Jodie Hoh (jhoh5)
+
 # searchAgents.py
 # ---------------
 # Licensing Information:  You are free to use or extend these projects for
@@ -10,7 +13,6 @@
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
-
 
 """
 This file contains all of the agents that can be selected to control Pacman.  To
@@ -358,6 +360,8 @@ def cornersHeuristic(state, problem):
     """
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
+
+    print(state)
 
     "*** YOUR CODE HERE ***"
     return 0 # Default to trivial solution
