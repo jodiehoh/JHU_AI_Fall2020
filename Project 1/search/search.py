@@ -120,40 +120,67 @@ def depthFirstSearch(problem):
 
 
 def breadthFirstSearch(problem):
-    """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
-    from util import Queue
+	
+	"""Search the shallowest nodes in the search tree first."""
+	"*** YOUR CODE HERE ***"
 
-    visited = set()
-    ans = list()
+	from util import Queue
 
-    parent = {problem.getStartState() : None}
-    direction = {problem.getStartState() : 0}
+	queue = Queue()  # stack of Nodes
+	visited = set()
 
-    queue = Queue()
-    queue.push((problem.getStartState(), '0'))
-    visited.add(problem.getStartState())
+	node = Node(problem.getStartState(), None, 0, None)
+	queue.push(node)
+	visited.add(node.state)
+
+	while not queue.isEmpty():
+		curr = queue.pop()
+		
+
+		if problem.isGoalState(curr.state):
+			return path(curr, problem)
+
+		successors = problem.getSuccessors(curr.state)
+		for s in successors:
+			if s[0] not in visited:
+				newNode = Node(s[0], s[1], s[2], curr)
+				visited.add(s[0])
+				queue.push(newNode)
+	"""
 
 
-    while not queue.isEmpty():
+	from util import Queue
 
-        node = queue.pop()
+	visited = set()
+	ans = list()
 
-        if(problem.isGoalState(node[0])):
-            curr = node[0]
-            while(curr is not None):
-                ans.append(direction[curr])
-                curr = parent[curr]
-            ans.pop()
-            ans.reverse()
-            return ans
+	parent = {problem.getStartState() : None}
+	direction = {problem.getStartState() : 0}
 
-        for succ in problem.getSuccessors(node[0]):
-            if (succ[0] not in visited):
-                queue.push(succ)
-                visited.add(succ[0])
-                parent[succ[0]] = node[0]
-                direction[succ[0]] = succ[1]
+	queue = Queue()
+	queue.push((problem.getStartState(), '0'))
+	visited.add(problem.getStartState())
+
+
+	while not queue.isEmpty():
+		node = queue.pop()
+		if(problem.isGoalState(node[0])):
+			curr = node[0]
+			while(curr is not None):
+				ans.append(direction[curr])
+				curr = parent[curr]
+			ans.pop()
+			ans.reverse()
+			return ans
+
+		for succ in problem.getSuccessors(node[0]):
+			print(succ)
+			if (succ[0] not in visited):
+				queue.push(succ)
+				visited.add(succ[0])
+				parent[succ[0]] = node[0]
+				direction[succ[0]] = succ[1]
+	"""
 
 
 def uniformCostSearch(problem):
