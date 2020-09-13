@@ -207,6 +207,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 
     node = Node(problem.getStartState(), None, 0, None)
     map[problem.getStartState()] = node
+    
     open.push(problem.getStartState(), 0)
 
     while not open.isEmpty():
