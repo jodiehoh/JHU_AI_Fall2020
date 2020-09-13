@@ -217,27 +217,18 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     open.push(node, node.cost + heuristic(node.state, problem))
 
     while not open.isEmpty():
-
         curr = open.pop()
-        #print(curr.state)
+        closed.add(curr.state)
 
         if problem.isGoalState(curr.state):
             return path(curr, problem)
 
-        closed.add(curr.state)
-        #print("closed")
-        #print(closed)
-
         successors = problem.getSuccessors(curr.state)
-        #print(successors)
-
         for s in successors:
-            if s[0] in closed:
-                continue;
-
-            n = Node(s[0], s[1], s[2], curr)
-            f = n.cost + heuristic(n.state, problem)
-            open.update(n, f)
+            if s[0] not in closed:
+                newNode = Node(s[0], s[1], s[2] + curr.cost, curr)
+                f = newNode.cost + heuristic(newNode.state, problem)
+                open.update(newNode, f)
 
 
 def path(node, problem):
