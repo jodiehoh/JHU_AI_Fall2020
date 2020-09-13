@@ -177,7 +177,7 @@ def uniformCostSearch(problem):
             ans.pop()
             ans.reverse()
             return ans
-        
+
         for succ in problem.getSuccessors(node[0]):
             if(succ[0] not in visited or cost[node[0]] + succ[2] < cost[succ[0]]):
                 visited.add(succ[0])
@@ -185,7 +185,7 @@ def uniformCostSearch(problem):
                 direction[succ[0]] = succ[1]
                 queue.push((succ[0], succ[1], cost[succ[0]]), cost[succ[0]])
                 parent[succ[0]] = node[0]
-        
+
 
 
 def nullHeuristic(state, problem=None):
@@ -203,23 +203,31 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 
     open = PriorityQueue()
     closed = set()
+    map = dict()  # states -> node(state, direction, cost, parent)
 
     node = Node(problem.getStartState(), None, 0, None)
-    open.push(node, node.cost + heuristic(node.state, problem))
+    map[problem.getStartState()] = node
+    open.push(problem.getStartState(), 0)
 
     while not open.isEmpty():
         curr = open.pop()
-        closed.add(curr.state)
+        closed.add(curr)
 
-        if problem.isGoalState(curr.state):
-            return path(curr, problem)
+        if problem.isGoalState(curr):
+            return path(map[curr], problem)
 
-        successors = problem.getSuccessors(curr.state)
+        successors = problem.getSuccessors(curr)
         for s in successors:
+            newCost = map[curr].cost + s[2]
             if s[0] not in closed:
-                newNode = Node(s[0], s[1], s[2] + curr.cost, curr)
+                # if its in map, that means its in open, so if new cost is higher we dont want it
+                if (map.get(s[0]) != None) and (newCost > map[s[0]].cost):
+                    continue
+
+                newNode = Node(s[0], s[1], newCost, map[curr])
+                map[s[0]] = newNode
                 f = newNode.cost + heuristic(newNode.state, problem)
-                open.update(newNode, f)
+                open.update(newNode.state, f)
 
 
 def path(node, problem):
