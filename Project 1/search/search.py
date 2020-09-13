@@ -99,17 +99,23 @@ def depthFirstSearch(problem):
     node = Node(problem.getStartState(), None, 0, None)
     stack.push(node)
 
+    print(problem.getStartState())
+    print("Corners:")
+    print(problem.getStartState()[1])
+
     while not stack.isEmpty():
         curr = stack.pop()
         visited.add(curr.state)
+        print(curr.state)
 
         if problem.isGoalState(curr.state):
+            print("this is goal state")
             return path(curr, problem)
 
         successors = problem.getSuccessors(curr.state)
         for s in successors:
             if s[0] not in visited:
-                newNode = Node(s[0], s[1], s[2], curr)
+                newNode = Node((s[0], curr[1]), s[1], s[2], curr)
                 stack.push(newNode)
 
 
@@ -210,7 +216,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 
     node = Node(problem.getStartState(), None, 0, None)
     map[problem.getStartState()] = node
-    
+
     open.push(problem.getStartState(), 0)
 
     while not open.isEmpty():
@@ -247,7 +253,7 @@ def path(node, problem):
 
 class Node:
 
-    state = (-1, -1)
+    state = ((-1, -1), ())
     direction = None
     cost = 0
     parent = None
