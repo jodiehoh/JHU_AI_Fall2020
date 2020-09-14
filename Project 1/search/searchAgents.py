@@ -293,11 +293,8 @@ class CornersProblem(search.SearchProblem):
         # in initializing the problem
         "*** YOUR CODE HERE ***"
 
-        self.map = dict()
-        for corner in self.corners:
-            self.map[corner] = False
-        #arr = (False, False, False, False)
-        self.start = (self.startingPosition, self.corners)
+        self.arr = (False, False, False, False)  # keep track of which corners were visited
+        self.start = (self.startingPosition, self.arr)
 
 
     def getStartState(self):
@@ -314,21 +311,9 @@ class CornersProblem(search.SearchProblem):
         """
         "*** YOUR CODE HERE ***"
 
-        """
-        print("is goal state:")
-        print(state)
-        print(self.map)
-        """
-
-        if state in self.corners:
-            self.map[state] = True
-
-            for m in self.map:
-                print(m)
-                print(self.map[m])
-                if self.map[m] != True:
-                    return False
+        if state[1] == (True, True, True, True):
             return True
+        return False
 
     def getSuccessors(self, state):
         """
@@ -351,15 +336,33 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
-            print(state)
             x,y = state[0]
             dx, dy = Actions.directionToVector(action)
             nextx, nexty = int(x + dx), int(y + dy)
             if not self.walls[nextx][nexty]:
-                successors.append(((nextx, nexty), action, 1))
+                newCorners = CornersProblem.updateCorners(self, nextx, nexty, state[1])
+                s = ((nextx, nexty), newCorners)
+                successors.append((s, action, 1))
 
         self._expanded += 1 # DO NOT CHANGE
         return successors
+
+    def updateCorners(self, x, y, corners):
+        c0 = corners[0]
+        c1 = corners[1]
+        c2 = corners[2]
+        c3 = corners[3]
+
+        if ((x, y) == self.corners[0]):
+            c0 = True
+        elif ((x, y) == self.corners[1]):
+            c1 = True
+        elif ((x, y) == self.corners[2]):
+            c2 = True
+        elif ((x, y) == self.corners[3]):
+            c3 = True
+
+        return (c0, c1, c2, c3)
 
     def getCostOfActions(self, actions):
         """
