@@ -390,6 +390,10 @@ def cornersHeuristic(state, problem):
     print(state)
 
     "*** YOUR CODE HERE ***"
+    xy1 = state
+    xy2 = problem.goal
+    return abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
+
     return 0 # Default to trivial solution
 
 class AStarCornersAgent(SearchAgent):

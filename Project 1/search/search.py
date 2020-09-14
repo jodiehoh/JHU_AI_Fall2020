@@ -101,7 +101,7 @@ def depthFirstSearch(problem):
 
     print(problem.getStartState())
     print("Corners:")
-    print(problem.getStartState()[1])
+    print(problem.getStartState())
 
     while not stack.isEmpty():
         curr = stack.pop()
@@ -115,12 +115,12 @@ def depthFirstSearch(problem):
         successors = problem.getSuccessors(curr.state)
         for s in successors:
             if s[0] not in visited:
-                newNode = Node((s[0], curr[1]), s[1], s[2], curr)
+                newNode = Node(s[0], s[1], s[2], curr)
                 stack.push(newNode)
 
 
 def breadthFirstSearch(problem):
-	
+
 	"""Search the shallowest nodes in the search tree first."""
 	"*** YOUR CODE HERE ***"
 
@@ -135,7 +135,7 @@ def breadthFirstSearch(problem):
 
 	while not queue.isEmpty():
 		curr = queue.pop()
-		
+
 
 		if problem.isGoalState(curr.state):
 			return path(curr, problem)
@@ -280,7 +280,7 @@ def path(node, problem):
 
 class Node:
 
-    state = ((-1, -1), ())
+    state = (-1, -1)
     direction = None
     cost = 0
     parent = None
