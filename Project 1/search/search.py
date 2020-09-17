@@ -136,7 +136,6 @@ def breadthFirstSearch(problem):
 	while not queue.isEmpty():
 		curr = queue.pop()
 
-
 		if problem.isGoalState(curr.state):
 			return path(curr, problem)
 
@@ -146,42 +145,6 @@ def breadthFirstSearch(problem):
 				newNode = Node(s[0], s[1], s[2], curr)
 				visited.add(s[0])
 				queue.push(newNode)
-	"""
-
-
-	from util import Queue
-
-	visited = set()
-	ans = list()
-
-	parent = {problem.getStartState() : None}
-	direction = {problem.getStartState() : 0}
-
-	queue = Queue()
-	queue.push((problem.getStartState(), '0'))
-	visited.add(problem.getStartState())
-
-
-	while not queue.isEmpty():
-		node = queue.pop()
-		if(problem.isGoalState(node[0])):
-			curr = node[0]
-			while(curr is not None):
-				ans.append(direction[curr])
-				curr = parent[curr]
-			ans.pop()
-			ans.reverse()
-			return ans
-
-		for succ in problem.getSuccessors(node[0]):
-			print(succ)
-			if (succ[0] not in visited):
-				queue.push(succ)
-				visited.add(succ[0])
-				parent[succ[0]] = node[0]
-				direction[succ[0]] = succ[1]
-	"""
-
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
@@ -199,9 +162,7 @@ def uniformCostSearch(problem):
     queue.push((problem.getStartState(), 0, 0), 0)
     visited.add(problem.getStartState())
 
-
     while not queue.isEmpty():
-
         node = queue.pop()
 
         if(problem.isGoalState(node[0])):
@@ -221,8 +182,6 @@ def uniformCostSearch(problem):
                 direction[succ[0]] = succ[1]
                 queue.push((succ[0], succ[1], cost[succ[0]]), cost[succ[0]])
                 parent[succ[0]] = node[0]
-
-
 
 def nullHeuristic(state, problem=None):
     """
@@ -266,8 +225,11 @@ def aStarSearch(problem, heuristic=nullHeuristic):
                 f = newNode.cost + heuristic(newNode.state, problem)
                 open.update(newNode.state, f)
 
-
 def path(node, problem):
+    """
+    A very short helper function that when given a node, returns the path it
+    used to get here
+    """
     actions = list()
 
     while node.state != problem.getStartState():
@@ -277,9 +239,11 @@ def path(node, problem):
     actions.reverse()
     return actions
 
-
 class Node:
-
+    """
+    A node class that tracks current position, the direction it took to get here,
+    the cost of this node, and its parent
+    """
     state = (-1, -1)
     direction = None
     cost = 0
