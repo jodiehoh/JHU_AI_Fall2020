@@ -1,3 +1,5 @@
+#Charissa Zou (czou9)
+#Jodie Hoh (jhoh5)
 # multiAgents.py
 # --------------
 # Licensing Information:  You are free to use or extend these projects for
@@ -72,9 +74,31 @@ class ReflexAgent(Agent):
         newFood = successorGameState.getFood()
         newGhostStates = successorGameState.getGhostStates()
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
-
         "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+        ghostPositions = list()
+        foodPositions = list()
+        closestDistanceGhost = -1
+        closestDistanceFood = -1
+
+        for ghosts in newGhostStates:
+          if (ghosts.scaredTimer == 0):
+            ghostPositions.append(manhattanDistance(newPos, ghosts.getPosition()))
+
+        if (len(ghostPositions) == 0):
+          closestDistanceGhost = 10000
+        else:
+          closestDistanceGhost = min(ghostPositions)
+
+        for food in newFood.asList():
+            foodPositions.append(manhattanDistance(newPos, food))
+
+        if (len(foodPositions) == 0):
+          closestDistanceFood = 0
+        else:
+          closestDistanceFood = min(foodPositions)
+
+        score = 8 / (closestDistanceGhost + 1) + closestDistanceFood / 3
+        return successorGameState.getScore() - score
 
 def scoreEvaluationFunction(currentGameState):
     """
@@ -129,7 +153,44 @@ class MinimaxAgent(MultiAgentSearchAgent):
             Returns the total number of agents in the game
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return self.minimax(gameState, self.depth, 0)[1]
+
+    def minimax(self, gameState, depth, agentIndex):
+      if (agentIndex == gameState.getNumAgents()):
+        agentIndex = 0
+        depth = depth - 1
+
+      if (depth == 0 or gameState.isWin() or gameState.isLose()):
+        return (self.evaluationFunction(gameState), Directions.STOP)
+
+      if (agentIndex == 0):
+        return self.maxAction(gameState, depth, agentIndex)
+      else:
+        return self.minAction(gameState, depth, agentIndex)
+
+    def maxAction(self, gameState, depth, agentIndex):
+      actions = gameState.getLegalActions(agentIndex)
+      bestScore = float('-inf')
+      bestAction = None
+      for action in actions:
+        sucessor = gameState.generateSuccessor(agentIndex, action)
+        score = self.minimax(sucessor, depth, agentIndex + 1)[0]
+        if (score > bestScore):
+          bestScore = score 
+          bestAction = action 
+      return [bestScore, bestAction]
+
+    def minAction(self, gameState, depth, agentIndex):
+      actions = gameState.getLegalActions(agentIndex)
+      bestScore = float('inf')
+      bestAction = None
+      for action in actions:
+        sucessor = gameState.generateSuccessor(agentIndex, action)
+        score = self.minimax(sucessor, depth, agentIndex + 1)[0]
+        if (score < bestScore):
+          bestScore = score 
+          bestAction = action 
+      return [bestScore, bestAction]
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
@@ -140,8 +201,52 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         """
           Returns the minimax action using self.depth and self.evaluationFunction
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return self.minimax(gameState, self.depth, 0, float('-inf'), float('inf'))[1]
+
+    def minimax(self, gameState, depth, agentIndex, alpha, beta):
+      if (agentIndex == gameState.getNumAgents()):
+        agentIndex = 0
+        depth = depth - 1
+
+      if (depth == 0 or gameState.isWin() or gameState.isLose()):
+        return (self.evaluationFunction(gameState), Directions.STOP)
+
+      if (agentIndex == 0):
+        return self.maxAction(gameState, depth, agentIndex, alpha, beta)
+      else:
+        return self.minAction(gameState, depth, agentIndex, alpha, beta)
+
+    def maxAction(self, gameState, depth, agentIndex, alpha, beta):
+      actions = gameState.getLegalActions(agentIndex)
+      bestScore = float('-inf')
+      bestAction = None
+      for action in actions:
+        sucessor = gameState.generateSuccessor(agentIndex, action)
+        score = self.minimax(sucessor, depth, agentIndex + 1, alpha, beta)[0]
+        if (score > bestScore):
+          bestScore = score 
+          bestAction = action 
+        if (bestScore > beta):
+          return [bestScore, bestAction]
+        alpha = max({alpha, score})
+
+      return [bestScore, bestAction]
+
+    def minAction(self, gameState, depth, agentIndex, alpha, beta):
+      actions = gameState.getLegalActions(agentIndex)
+      bestScore = float('inf')
+      bestAction = None
+      for action in actions:
+        sucessor = gameState.generateSuccessor(agentIndex, action)
+        score = self.minimax(sucessor, depth, agentIndex + 1, alpha, beta)[0]
+        if (score < bestScore):
+          bestScore = score 
+          bestAction = action 
+        if (bestScore < alpha):
+          return [bestScore, bestAction]
+        beta = min({beta, score})
+
+      return [bestScore, bestAction]
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
@@ -156,7 +261,46 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
           legal moves.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return self.expectimax(gameState, self.depth, 0)[1]
+
+    def expectimax(self, gameState, depth, agentIndex):
+      if (agentIndex == gameState.getNumAgents()):
+        agentIndex = 0
+        depth = depth - 1
+
+      if (depth == 0 or gameState.isWin() or gameState.isLose()):
+        return (self.evaluationFunction(gameState), Directions.STOP)
+
+      if (agentIndex == 0):
+        return self.maxAction(gameState, depth, agentIndex)
+      else:
+        return self.average(gameState, depth, agentIndex)
+
+    def average(self, gameState, depth, agentIndex):
+      actions = gameState.getLegalActions(agentIndex)
+      bestScore = float('-inf')
+      bestAction = None
+
+      totalScore = 0
+      for action in actions:
+        sucessor = gameState.generateSuccessor(agentIndex, action)
+        score = self.expectimax(sucessor, depth, agentIndex + 1)[0]
+        totalScore += score
+
+      return (totalScore/len(actions), Directions.STOP)
+
+    def maxAction(self, gameState, depth, agentIndex):
+      actions = gameState.getLegalActions(agentIndex)
+      bestScore = float('-inf')
+      bestAction = None
+      for action in actions:
+        sucessor = gameState.generateSuccessor(agentIndex, action)
+        score = self.expectimax(sucessor, depth, agentIndex + 1)[0]
+        if (score > bestScore):
+          bestScore = score 
+          bestAction = action 
+      return [bestScore, bestAction]
+
 
 def betterEvaluationFunction(currentGameState):
     """
@@ -166,8 +310,40 @@ def betterEvaluationFunction(currentGameState):
       DESCRIPTION: <write something here so we know what you did>
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    successorGameState = currentGameState
+    newPos = successorGameState.getPacmanPosition()
+    newFood = successorGameState.getFood()
+    newGhostStates = successorGameState.getGhostStates()
+    newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+    ghostPositions = list()
+    foodPositions = list()
+    closestDistanceGhost = -1
+    closestDistanceFood = -1
+
+    for ghosts in newGhostStates:
+      if (ghosts.scaredTimer == 0):
+        ghostPositions.append(manhattanDistance(newPos, ghosts.getPosition()))
+
+    if (len(ghostPositions) == 0):
+      closestDistanceGhost = 10000
+    else:
+      closestDistanceGhost = min(ghostPositions)
+
+    for food in newFood.asList():
+        foodPositions.append(manhattanDistance(newPos, food))
+
+    if (len(foodPositions) == 0):
+      closestDistanceFood = 0
+    else:
+      closestDistanceFood = min(foodPositions)
+
+    score = 8 / (closestDistanceGhost + 1) + closestDistanceFood / 3
+    return successorGameState.getScore() - score
 
 # Abbreviation
 better = betterEvaluationFunction
+
+def manhattanHeuristic(pos1, pos2):
+    "The Manhattan distance"
+    return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
 
