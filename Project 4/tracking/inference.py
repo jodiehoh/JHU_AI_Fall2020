@@ -1,3 +1,6 @@
+# Charissa Zou czou9
+# Jodie Hoh jhoh5
+#
 # inference.py
 # ------------
 # Licensing Information:  You are free to use or extend these projects for
@@ -311,12 +314,12 @@ class ExactInference(InferenceModule):
         """
         "*** YOUR CODE HERE ***"
 
-        
+
         pacman = gameState.getPacmanPosition()
         jail = self.getJailPosition()
 
         for position in self.allPositions:
-            probability = self.getObservationProb(observation, pacman, position, jail) 
+            probability = self.getObservationProb(observation, pacman, position, jail)
             self.beliefs[position] = probability * self.beliefs[position]
 
         self.beliefs.normalize()
@@ -415,6 +418,7 @@ class ParticleFilter(InferenceModule):
         gameState.
         """
         "*** YOUR CODE HERE ***"
+        newParticles = []
         newPositions = {}
 
         for oldParticle in self.particles:
