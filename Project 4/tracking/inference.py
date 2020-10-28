@@ -75,7 +75,12 @@ class DiscreteDistribution(dict):
         {}
         """
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+        total = float(self.total())
+        if total == 0:
+            return 
+        for k in self.keys():
+            self[k] = self[k] / total
+
 
     def sample(self):
         """
@@ -99,7 +104,22 @@ class DiscreteDistribution(dict):
         0.0
         """
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+        self.normalize()
+        items = self.items()
+
+        values = [item[0] for item in items]
+        weights = [item[1] for item in items]
+
+        rand = random.random()
+
+        for item in items:
+            values.append(item[0]) 
+            weights.append(item[1]) 
+
+        for i, value in enumerate(values):
+            if weights[i] >= rand:
+                return value
+            rand -= weights[i]
 
 
 class InferenceModule:
@@ -168,8 +188,21 @@ class InferenceModule:
         """
         Return the probability P(noisyDistance | pacmanPosition, ghostPosition).
         """
-        "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+
+        if noisyDistance == None: 
+            if jailPosition == ghostPosition:
+                return 1
+            else:
+                return 0
+        if noisyDistance != None: 
+            if jailPosition == ghostPosition:
+                return 0
+
+        manDistance = manhattanDistance(pacmanPosition,ghostPosition)
+
+        return busters.getObservationProbability(noisyDistance, manDistance)
+
+
 
     def setGhostPosition(self, gameState, ghostPosition, index):
         """
