@@ -27,6 +27,8 @@ class PerceptronModel(object):
         Returns: a node containing a single number (the score)
         """
         "*** YOUR CODE HERE ***"
+        node = nn.DotProduct(self.w, x)
+        return node
 
     def get_prediction(self, x):
         """
@@ -34,13 +36,25 @@ class PerceptronModel(object):
 
         Returns: 1 or -1
         """
-        "*** YOUR CODE HERE ***"
+        if nn.as_scalar(self.run(x)) >= 0:
+            return 1
+        return -1
 
     def train(self, dataset):
         """
         Train the perceptron until convergence.
         """
         "*** YOUR CODE HERE ***"
+        changes = True
+
+        while changes:
+            changes = False
+            data = dataset.iterate_once(1)
+            for x, y in data:
+                if self.get_prediction(x) != nn.as_scalar(y):
+                    changes = True
+                    nn.Parameter.update(self.w, x, nn.as_scalar(y))
+
 
 class RegressionModel(object):
     """
@@ -51,6 +65,11 @@ class RegressionModel(object):
     def __init__(self):
         # Initialize your model parameters here
         "*** YOUR CODE HERE ***"
+        self.batchSize = 1
+        self.w1 = nn.Parameter(1, 100)
+        self.b1 = nn.Parameter(1, 100)
+        self.w2 = nn.Parameter(100, 1)
+        self.b2 = nn.Parameter(1, 1)
 
     def run(self, x):
         """
@@ -62,6 +81,12 @@ class RegressionModel(object):
             A node with shape (batch_size x 1) containing predicted y-values
         """
         "*** YOUR CODE HERE ***"
+        layer_1 = nn.ReLU(nn.AddBias(nn.Linear(x, self.w1), self.b1))
+        layer_2 = nn.AddBias(nn.Linear(layer_1, self.w2), self.b2)
+
+        return layer_2
+
+
 
     def get_loss(self, x, y):
         """
@@ -74,12 +99,28 @@ class RegressionModel(object):
         Returns: a loss node
         """
         "*** YOUR CODE HERE ***"
+        return nn.SquareLoss(self.run(x), y)
 
     def train(self, dataset):
         """
         Trains the model.
         """
         "*** YOUR CODE HERE ***"
+
+        changes = True
+        while changes:
+            data = dataset.iterate_once(self.batchSize)
+            for x, y in data:
+                loss = self.get_loss(x,y)
+                gradients = nn.gradients(loss, [self.w1, self.w2, self.b1, self.b2])
+                self.w1.update(gradients[0], -0.01)
+                self.w2.update(gradients[1], -0.01)
+                self.b1.update(gradients[2], -0.01)
+                self.b2.update(gradients[3], -0.01)
+            
+            loss_xy = self.get_loss(nn.Constant(dataset.x), nn.Constant(dataset.y))
+            if nn.as_scalar(loss_xy) <= 0.02:
+                changes = False
 
 class DigitClassificationModel(object):
     """
