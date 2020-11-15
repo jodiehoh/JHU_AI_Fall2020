@@ -81,12 +81,9 @@ class RegressionModel(object):
             A node with shape (batch_size x 1) containing predicted y-values
         """
         "*** YOUR CODE HERE ***"
-        layer_1 = nn.ReLU(nn.AddBias(nn.Linear(x, self.w1), self.b1))
-        layer_2 = nn.AddBias(nn.Linear(layer_1, self.w2), self.b2)
-
-        return layer_2
-
-
+        layer1 = nn.ReLU(nn.AddBias(nn.Linear(x, self.w1), self.b1))
+        layer2 = nn.AddBias(nn.Linear(layer1, self.w2), self.b2)
+        return layer2
 
     def get_loss(self, x, y):
         """
@@ -117,9 +114,9 @@ class RegressionModel(object):
                 self.w2.update(gradients[1], -0.01)
                 self.b1.update(gradients[2], -0.01)
                 self.b2.update(gradients[3], -0.01)
-            
-            loss_xy = self.get_loss(nn.Constant(dataset.x), nn.Constant(dataset.y))
-            if nn.as_scalar(loss_xy) <= 0.02:
+
+            newLoss = self.get_loss(nn.Constant(dataset.x), nn.Constant(dataset.y))
+            if nn.as_scalar(newLoss) <= 0.02:
                 changes = False
 
 class DigitClassificationModel(object):
