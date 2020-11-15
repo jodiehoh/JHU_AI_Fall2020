@@ -1,3 +1,7 @@
+# Jodie Hoh, Charissa Zou
+# jhoh5, czou9
+
+
 import nn
 
 class PerceptronModel(object):
