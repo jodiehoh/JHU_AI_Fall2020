@@ -63,6 +63,23 @@ class ValueIterationAgent(ValueEstimationAgent):
         # Write value iteration code here
         "*** YOUR CODE HERE ***"
 
+        states = self.mdp.getStates()
+
+        it = 0
+        while it < self.iterations:
+            values = self.values.copy()
+            for state in states:
+                self.values[state] = -float('inf')
+                possibleAction = self.mdp.getPossibleActions(state)
+
+                for action in possibleAction:
+                    qValue = 0
+                    for transitionState, probability in self.mdp.getTransitionStatesAndProbs(state, action):
+                        qValue += probability * (self.mdp.getReward(state, action, transitionState) + self.discount * values[transitionState])
+                    self.values[state] = max(self.values[state], qValue)
+                if self.values[state] == -float('inf'):
+                    self.values[state] = 0.0
+            it += 1
 
     def getValue(self, state):
         """
@@ -77,7 +94,17 @@ class ValueIterationAgent(ValueEstimationAgent):
           value function stored in self.values.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        statesAndProbs = self.mdp.getTransitionStatesAndProbs(state,action)
+
+        qValue = 0.0
+
+        for pair in statesAndProbs:
+            stateNew = pair[0]
+            probability = float(pair[1])
+            reward = self.mdp.getReward(state,action,stateNew)
+
+            qValue += probability * (reward + self.discount * self.values[stateNew])
+        return qValue
 
     def computeActionFromValues(self, state):
         """
@@ -89,7 +116,19 @@ class ValueIterationAgent(ValueEstimationAgent):
           terminal state, you should return None.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        if self.mdp.isTerminal(state):
+            return None
+        else:
+            actions = self.mdp.getPossibleActions(state)
+            bestAction = None
+            qValueBest = float("-inf")
+
+            for action in actions:
+                qValue = self.computeQValueFromValues(state, action)
+                if (qValue >= qValueBest):
+                    bestAction = action
+                    qValueBest = qValue 
+        return bestAction
 
     def getPolicy(self, state):
         return self.computeActionFromValues(state)
@@ -129,7 +168,19 @@ class AsynchronousValueIterationAgent(ValueIterationAgent):
         ValueIterationAgent.__init__(self, mdp, discount, iterations)
 
     def runValueIteration(self):
-        "*** YOUR CODE HERE ***"
+        it = 0
+        states = self.mdp.getStates()
+        length = len(states)
+        new = util.Counter()
+
+        while (it < self.iterations):
+        	state = states[it % length]
+        	if not self.mdp.isTerminal(state):
+        		action = self.getAction(state)
+        		if action is not None:
+        			new[state] = self.getQValue(state, action)
+        		self.values = new
+        	it += 1
 
 class PrioritizedSweepingValueIterationAgent(AsynchronousValueIterationAgent):
     """
