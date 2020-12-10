@@ -127,7 +127,7 @@ class ValueIterationAgent(ValueEstimationAgent):
                 qValue = self.computeQValueFromValues(state, action)
                 if (qValue >= qValueBest):
                     bestAction = action
-                    qValueBest = qValue 
+                    qValueBest = qValue
         return bestAction
 
     def getPolicy(self, state):
@@ -234,7 +234,13 @@ class PrioritizedSweepingValueIterationAgent(AsynchronousValueIterationAgent):
                 break
 
             state = queue.pop()
-            self.values[state] = self.stateValueIterationStep(state)
+
+            maxQValue = float('-inf')
+            for action in self.mdp.getPossibleActions(state):
+                QValue = self.computeQValueFromValues(state, action)
+                maxQValue = max(maxQValue, QValue)
+
+            self.values[state] = maxQValue
 
             for pred in predecessors[state]:
                 diff = self.difference(pred)
