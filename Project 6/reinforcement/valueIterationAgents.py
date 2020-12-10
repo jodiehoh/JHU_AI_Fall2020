@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -18,7 +18,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -150,4 +150,35 @@ class PrioritizedSweepingValueIterationAgent(AsynchronousValueIterationAgent):
 
     def runValueIteration(self):
         "*** YOUR CODE HERE ***"
+        predecessors = collections.defaultdict(set)
 
+        for state in self.mdp.getStates():
+            for action in self.mdp.getPossibleActions(state):
+                for nextState, prob in self.mdp.getTransitionStatesAndProbs(state, action):
+                    if prob > 0:
+                        predecessors[nextState].add(state)
+
+        queue = util.PriorityQueue()
+
+        for state in self.mdp.getStates():
+            if not self.mdp.isTerminal(state):
+                maxQValue = float('-inf')
+
+                for action in self.mdp.getPossibleActions(state):
+                    QValue = self.computeQValueFromValues(state, action)
+                    maxQValue = max(maxQValue, QValue)
+                    
+                diff = abs(maxQValue - self.values[state])
+                queue.push(state, -diff)
+
+        for _ in range(self.iterations):
+            if queue.isEmpty():
+                break
+
+            state = queue.pop()
+            self.values[state] = self.stateValueIterationStep(state)
+
+            for pred in predecessors[state]:
+                diff = self.difference(pred)
+                if diff > self.theta:
+                    queue.update(pred, -diff)
